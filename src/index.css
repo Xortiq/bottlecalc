@@ -1,0 +1,99 @@
+body .container-wrapper {
+  padding: 40px 15px;
+}
+body .cal-section {
+  background-color: var(--bs-secondary-bg);
+  padding: 30px;
+  margin: 50px 0;
+  border-radius: 1rem;
+}
+body .cal-section [class^='bouteille-container'] {
+  background-color: var(--bs-tertiary-bg);
+  padding: 20px;
+  border-radius: 1rem;
+  margin: 15px 0;
+}
+body .cal-section [class^='bouteille-container'] .bouteille-img-wrapper,
+body .cal-section [class^='bouteille-container'] .boites-img-wrapper {
+  display: flex;
+  justify-content: center;
+}
+body .cal-section [class^='bouteille-container'] .bouteille-img-wrapper .img,
+body .cal-section [class^='bouteille-container'] .boites-img-wrapper .img {
+  width: 48px;
+  height: 48px;
+  aspect-ratio: 1;
+  padding: 5px;
+  border-radius: 50%;
+  background-color: #cfe2ff;
+}
+body .cal-section [class^='bouteille-container'] .bouteille-img-wrapper .img img,
+body .cal-section [class^='bouteille-container'] .boites-img-wrapper .img img {
+  width: 100%;
+  aspect-ratio: 1;
+}
+body .cal-section .bouteille-container-autres {
+  padding: 15px;
+}
+body .cal-section .field-wrapper {
+  margin: 1rem 0;
+}
+body .cal-section .field-wrapper .label-wrapper label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+body .cal-section .field-wrapper .bouteille-wrapper,
+body .cal-section .field-wrapper .ajout-boite-wrapper {
+  position: relative;
+}
+body .cal-section .field-wrapper .bouteille-wrapper input,
+body .cal-section .field-wrapper .ajout-boite-wrapper input {
+  height: 45px;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid;
+  border-radius: 4px;
+  text-align: center;
+  border-color: #cfe2ff;
+  border-bottom: none;
+}
+body .cal-section .field-wrapper button.btn {
+  border-radius: 4px 4px 0px 0px;
+  background-color: var(--bs-secondary-bg);
+}
+body .cal-section .field-wrapper button.btn span {
+  pointer-events: none;
+}
+body .cal-section .field-wrapper button.btn:hover {
+  background-color: var(--bs-tertiary-bg);
+}
+body .cal-section .field-wrapper button.btn.btn-ajouter {
+  margin-top: -2px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  width: 100%;
+  border-radius: 0px 0px 4px 4px;
+  border-color: #cfe2ff;
+  border-top: none;
+}
+body .cal-section .field-wrapper button.btn.btn-decrement,
+body .cal-section .field-wrapper button.btn.btn-increment {
+  position: absolute;
+  top: 1px;
+  height: 43px;
+  min-width: 60px;
+  font-size: 2rem;
+}
+body .cal-section .field-wrapper button.btn.btn-decrement span,
+body .cal-section .field-wrapper button.btn.btn-increment span {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -56%);
+}
+body .cal-section .field-wrapper button.btn.btn-decrement {
+  left: 1px;
+}
+body .cal-section .field-wrapper button.btn.btn-increment {
+  right: 1px;
+}
