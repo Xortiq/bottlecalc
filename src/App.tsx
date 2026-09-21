@@ -199,33 +199,33 @@ function App() {
     increment: (e:any) => {
       e.preventDefault();
       const id = e.target.getAttribute('data-target-id'); 
-      const field = document.getElementById(id);
+      const field = (document.getElementById(id) as HTMLInputElement);
       console.log(field.nodeName);
       if (field.nodeName == "INPUT") {
         const currentValue = Number(field.value) || 0;
-        field.value = currentValue + 1;
+        field.value = String(currentValue + 1);
       }
     },
     decrement: (e:any) => {
       e.preventDefault();
       const id = e.target.getAttribute('data-target-id'); 
-      const field = document.getElementById(id);
+      const field = (document.getElementById(id) as HTMLInputElement);
       console.log(field.nodeName);
       if (field.nodeName == "INPUT") {
         const currentValue = Number(field.value) || 0;
-        field.value = currentValue - 1;
+        field.value = String(currentValue - 1);
       }
     },
     submit: (e:any) => {
       e.preventDefault();
       const id = e.target.getAttribute('data-target-id');
-      const field = document.getElementById(id);
+      const field = (document.getElementById(id) as HTMLInputElement);
       if (field.nodeName == "INPUT") {
         if (Number(field.value) == 0) return
         console.log(field.nodeName);
         // trigger a submit event on field
         field.dispatchEvent(new Event('submit', { bubbles: true }));
-        field.value = undefined;
+        field.value = '';
       }
 
     } 
