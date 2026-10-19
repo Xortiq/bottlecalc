@@ -20,14 +20,18 @@ function Header(props) {
                     <h1>Mon application de calcul de boissons</h1>
                     <p>Calculez la quantité de boissons</p>
                 </div>
-                <div className="col-12 text-center">
+                <div className="col-12 d-flex justify-content-center">
                     {/* Navigation */}
-                    <nav>
-                    {
-                        Navigation.map((item, index) => (
-                            <Link key={index} to={item.path} className={CurrentPage(item.path)}>{item.name}</Link>
-                        ))
-                    }
+                    <nav className='navbar navbar-expand-lg navbar-light bg-ligh'>
+                        <ul className='navbar-nav mr-auto'>
+                            {
+                                Navigation.map((item, index) => (
+                                    <li className='nav-item'>
+                                        <Link key={index} to={item.path} className={`nav-link ${CurrentPage(item.path)}`}>{item.name}</Link>
+                                    </li>
+                                ))
+                            }
+                        </ul>
                     </nav>
                 </div>
             </div>
