@@ -39,7 +39,6 @@ function Bouteilles(props) {
                                             id={`bouteilles-${alcDynamicAttribute.attribute}-${price}`}
                                             placeholder={Math.sumPrecise(storage?.[bouteilleType]?.[price].quantite)}
                                             onSubmit={(e) => update.Bouteilles(bouteilleType, price, Number(e.target.value))}
-                                            readOnly
                                         />
                                         <button className="btn btn-decrement" onClick={(e)=>{buttonHandler.decrement(e)}} data-target-id={`bouteilles-${alcDynamicAttribute.attribute}-${price}`}><span>-</span></button>
                                         <button className="btn btn-increment" onClick={(e)=>{buttonHandler.increment(e)}} data-target-id={`bouteilles-${alcDynamicAttribute.attribute}-${price}`}><span>+</span></button>

@@ -23,7 +23,6 @@ function Gobbeuse(props) {
                                             id={`${data.key}-${subType}`}
                                             placeholder={Math.sumPrecise(subValue)}
                                             onSubmit={(e) => autresUpdateHandler(Number(e.target.value), 'gobbeuse', subType)}
-                                            readOnly
                                         />
                                         <button className="btn btn-decrement" onClick={(e) => { buttonHandler.decrement(e) }} data-target-id={`${data.key}-${subType}`}><span>-</span></button>
                                         <button className="btn btn-increment" onClick={(e) => { buttonHandler.increment(e) }} data-target-id={`${data.key}-${subType}`}><span>+</span></button>

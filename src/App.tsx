@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/Header.jsx';
+import ResultatsSection from './components/view/ResultatsSection.jsx';
 import AutresSection from './components/view/AutresSection.jsx';
 import AlcoolSection from './components/view/AlcoolSection.jsx';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -50,6 +52,62 @@ function App() {
           ecraser: [],
           canettes: [],
           bouteilles: []
+        }
+      },
+      montant: {
+        ouverture: {
+          manual: true,
+          name: "Iventaire d'ouverture",
+          identifier: "C",
+          quantite: {
+            avecAlcool: "",
+            sansAlcool: ""
+          }
+        },
+        caisses: {
+          manual: true,
+          name: "(-) Retour bouteilles aux caisses",
+          identifier: "D",
+          quantite: {
+            avecAlcool: "",
+            sansAlcool: ""
+          }
+        },
+        reception: {
+          manual: true,
+          name: "(+) Retour bouteilles à la reception",
+          identifier: "E",
+          quantite: {
+            avecAlcool: "",
+            sansAlcool: ""
+          }
+        },
+        sousTotal: {
+          manual: false,
+          name: "Sous total",
+          identifier: "F",
+          quantite: {
+            avecAlcool: "",
+            sansAlcool: ""
+          }
+        },
+        fermeture: {
+          manual: false,
+          name: "Inventaire de fermeture (A & B)",
+          identifier: "G",
+          quantite: {
+            avecAlcool: "",
+            sansAlcool: ""
+          }
+        },
+        difference: {
+          manual: false,
+          name: "Difference $",
+          identifier: "H",
+          quantite: {
+            avecAlcool: "",
+            sansAlcool: ""
+          }
         }
       }
     },
@@ -103,23 +161,6 @@ function App() {
       }));
     },
     Boites: (type: 'sansAlcool' | 'avecAlcool', size: 10 | 25, boites_size: number, value: number) => {
-      // if (value < 0) {
-      //   // setStorage((prevStorage: any) => {
-      //   //   const boitesObj = prevStorage[type][size].boites as any;
-      //   //   const { [boites_size]: _, ...remainingBoites } = boitesObj;
-      //   //   return {
-      //   //     ...prevStorage,
-      //   //     [type]: {
-      //   //       ...prevStorage[type],
-      //   //       [size]: {
-      //   //         ...prevStorage[type][size],
-      //   //         boites: remainingBoites
-      //   //       }
-      //   //     }
-      //   //   };
-      //   // });
-      //   return;
-      // }
       setStorage((prevStorage: any) => (
         {
           ...prevStorage,
@@ -174,17 +215,25 @@ function App() {
           bouteilles18L: prevStorage.autres.bouteilles18L ? [...prevStorage.autres.bouteilles18L, value] : [value]
         }
       }));
-    }
+    },
+    Montant: (value: number, source: 'ouverture' | 'caisses' | 'reception' | 'fermeture', type: 'sansAlcool' | 'avecAlcool') => {
+      // console.log(value, Number(value)),
+      setStorage((prevStorage: any) => ({
+        ...prevStorage,
+        montant: {
+          ...prevStorage.montant,
+          [source]: {
+            ...prevStorage.montant[source],
+            quantite: {
+              ...prevStorage.montant[source].quantite,
+              [type]: value
+            }
+          }
+        }
+      }));
+    },
   };
-
-  const [alcoolStatus, setAlcoolStatus] = useState(true);
-
-  // useEffect(() => {
-  //   if (typeof document.getElementById("root") == "object") {
-  //     document.body.setAttribute('data-bs-theme', document.getElementById("root").getAttribute('data-bs-theme') === 'light' ? 'light' : 'dark')
-  //     document.getElementById("root").removeAttribute('data-bs-theme')
-  //   }
-  // }, [])
+  
   const [colorTheme, setColorTheme] = useState(document.body.getAttribute('data-bs-theme') === 'light' ? 'light' : 'dark');
 
 
@@ -196,61 +245,203 @@ function App() {
   }, [storage]);
 
   const buttonHandler = {
-    increment: (e:any) => {
+    increment: (e: any) => {
       e.preventDefault();
-      const id = e.target.getAttribute('data-target-id'); 
+      const id = e.target.getAttribute('data-target-id');
       const field = (document.getElementById(id) as HTMLInputElement);
-      console.log(field.nodeName);
       if (field.nodeName == "INPUT") {
         const currentValue = Number(field.value) || 0;
         field.value = String(currentValue + 1);
       }
     },
-    decrement: (e:any) => {
+    decrement: (e: any) => {
       e.preventDefault();
-      const id = e.target.getAttribute('data-target-id'); 
+      const id = e.target.getAttribute('data-target-id');
       const field = (document.getElementById(id) as HTMLInputElement);
-      console.log(field.nodeName);
       if (field.nodeName == "INPUT") {
         const currentValue = Number(field.value) || 0;
         field.value = String(currentValue - 1);
       }
     },
-    submit: (e:any) => {
+    submit: (e: any) => {
       e.preventDefault();
       const id = e.target.getAttribute('data-target-id');
       const field = (document.getElementById(id) as HTMLInputElement);
       if (field.nodeName == "INPUT") {
         if (Number(field.value) == 0) return
-        console.log(field.nodeName);
         // trigger a submit event on field
         field.dispatchEvent(new Event('submit', { bubbles: true }));
         field.value = '';
       }
 
-    } 
+    }
   }
+  
+  const storageVal = {
+    verifyData: (size, type) => {
+      if (size !== 10 && size !== 25) return null;
+      if (type !== 'sansAlcool' && type !== 'avecAlcool') return null;
+      return {
+        bouteilleType: type,
+        price: size,
+      };
+    },
+    getAmount: (size, type) => {
+      const data = storageVal.verifyData(size, type);
+      if (!data) return null;
+
+      const liste = [];
+      Object.entries(storage[data.bouteilleType][data.price].boites || {}).forEach(([boxsize, count]) => {
+        if (data.bouteilleType == 'avecAlcool'&& size == 10 && boxsize == "24") return;
+        const total = boxsize * Math.sumPrecise(count)
+        liste.push(total);
+      });
+      liste.push(Math.sumPrecise(storage[data.bouteilleType][data.price].quantite));
+
+      return Math.sumPrecise(liste);
+    },
+    getPrice: (size, type) => {
+      return storageVal.getAmount(size, type) * (size === 10 ? 0.10 : 0.25);
+    },
+
+    sansAlcool: (size) => {
+      return storageVal.getAmount(size, 'sansAlcool');
+    },
+    prixSansAlcool: (size) => {
+      return storageVal.getPrice(size, 'sansAlcool');
+    },
+    avecAlcool: (size) => {
+      return storageVal.getAmount(size, 'avecAlcool');
+    },
+    prixAvecAlcool: (size) => {
+      return storageVal.getPrice(size, 'avecAlcool');
+    },
+
+    caisse24: () => {
+      const caisse = storage['avecAlcool']['10'].boites[24] || {};
+      const etage = storage['autres']['etage'] || {};
+      return Math.sumPrecise(caisse) + Math.sumPrecise(etage) * 12;
+    },
+    prixCaisse24: () => {
+      return storageVal.caisse24() * 2.40;
+    },
+
+    bouteilles18L: () => {
+      const bouteilles18L = storage['autres']['bouteilles18L'] || {};
+      return Math.sumPrecise(bouteilles18L)
+    },
+    prixBouteilles18L: () => {
+      return storageVal.bouteilles18L() * 10;
+    },
+
+    palette: () => {
+      const palette = storage['autres']['palette'] || {};
+      return Math.sumPrecise(palette)
+    },
+    prixPalette: () => {
+      return storageVal.palette() * 201.60;
+    },
+
+    gobbeuse: (type) => {
+      if (type !== 'ecraser' && type !== 'canettes' && type !== 'bouteilles') return null;
+      const gobbeuse = storage['autres']['gobbeuse'][type] || {};
+      return Math.sumPrecise(gobbeuse)
+    },
+    prixGobbeuse: (type) => {
+      if (type !== 'ecraser' && type !== 'canettes' && type !== 'bouteilles') return null;
+      const priceListe = {
+        ecraser: 60,
+        canettes: 24,
+        bouteilles: 6,
+      }
+      return storageVal.gobbeuse(type) * priceListe[type];
+    },
+
+    prixMontant:(name, type)=>{
+      if (name !== 'ouverture' && name !== 'caisses' && name !== 'reception' && name !== 'fermeture') return null;
+      if (type !== 'sansAlcool' && type !== 'avecAlcool') return null;
+      return storage.montant[name].quantite[type]
+    }
+  };
+
+  const Navigation = [
+    {
+      name: "Avec Alcool",
+      path: "/avec-alcool",
+      element: AvecAlcool(),
+    },
+    {
+      name: "Sans Alcool",
+      path: "/sans-alcool",
+      element: SansAlcool(),
+    },
+    {
+      name: "Autres",
+      path: "/autres",
+      element: Autres(),
+    },
+    {
+      name: "Resultats",
+      path: "/resultats",
+      element: Resultats(),
+    }
+  ]
+
+  function AvecAlcool() {
+    return <AlcoolSection
+      alcoolStatus={true}
+      storage={storage}
+      update={update}
+      buttonHandler={buttonHandler}
+    />;
+  }
+
+  function SansAlcool() {
+    return <AlcoolSection
+      alcoolStatus={false}
+      storage={storage}
+      update={update}
+      buttonHandler={buttonHandler}
+    />;
+  }
+
+  function Autres() {
+    return <AutresSection
+      storage={storage}
+      update={update}
+      buttonHandler={buttonHandler}
+    />;
+  }
+  function Resultats() {
+    return <ResultatsSection
+      storage={storage}
+      update={update}
+      storageVal={storageVal}
+    />;
+  }
+
 
   return (
     <>
-      <div className="container container-wrapper">
-        <Header alcoolStatus={alcoolStatus} setAlcoolStatus={setAlcoolStatus} />
-        <main>
-          <AlcoolSection
-            alcoolStatus={alcoolStatus}
-            storage={storage}
-            update={update}
-            buttonHandler={buttonHandler}
-            />
-          <hr />
-          <AutresSection
-            alcoolStatus={alcoolStatus}
-            storage={storage}
-            update={update}
-            buttonHandler={buttonHandler}
-          />
-        </main>
-      </div>
+      <BrowserRouter>
+
+        <div className="container container-wrapper">
+          <Header Navigation={Navigation} />
+          <main>
+            {/* Routes */}
+            <Routes>
+              {Navigation.map((navItem, index) => {
+                return (
+                  <Route key={index} path={navItem.path} element={navItem.element} />
+                );
+              })}
+              {/* <Route path="/avec-alcool" element={<AvecAlcool />} />
+              <Route path="/sans-alcool" element={<SansAlcool />} />
+              <Route path="/autres" element={<Autres />} /> */}
+            </Routes>
+          </main>
+        </div>
+      </BrowserRouter>
       <div className='dark-mode-toggle'>
         <button className="btn" onClick={() => {
           const newTheme = colorTheme === 'light' ? 'dark' : 'light';
@@ -261,7 +452,7 @@ function App() {
           Toggle Dark Mode
         </button>
       </div>
-      {/* <button className="btn" onClick={()=>session.clear()}>Reset</button> */}
+      <button className="btn" onClick={() => session.clear()}>Reset</button>
     </>
   )
 }

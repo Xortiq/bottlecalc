@@ -1,7 +1,6 @@
 import Bouteilles from './Items/Gobbeuse.jsx';
 function AutresSection(props) {
 
-    const alcoolStatus = props.alcoolStatus;
     const storage = props.storage;
     const update = props.update;
     const buttonHandler = props.buttonHandler;
@@ -71,7 +70,6 @@ function AutresSection(props) {
                                                     id={key}
                                                     placeholder={Math.sumPrecise(value)}
                                                     onSubmit={(e) => autresUpdateHandler(Number(e.target.value), type)}
-                                                    readOnly
                                                 />
                                                 <button className="btn btn-decrement" onClick={(e)=>{buttonHandler.decrement(e)}} data-target-id={key}><span>-</span></button>
                                                 <button className="btn btn-increment" onClick={(e)=>{buttonHandler.increment(e)}} data-target-id={key}><span>+</span></button>

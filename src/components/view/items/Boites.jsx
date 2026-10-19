@@ -62,7 +62,6 @@ function Boites(props) {
                                                         id={`${bouteilleType}-Boites-${boxsize}-${price}`}
                                                         placeholder={Math.sumPrecise(count)}
                                                         onSubmit={(e) => update.Boites(bouteilleType, Number(price), Number(boxsize), Number(e.target.value))}
-                                                        readOnly
                                                         />
                                                     <button className="btn btn-decrement" onClick={(e) => { buttonHandler.decrement(e) }} data-target-id={`${bouteilleType}-Boites-${boxsize}-${price}`}><span>-</span></button>
                                                     <button className="btn btn-increment" onClick={(e) => { buttonHandler.increment(e) }} data-target-id={`${bouteilleType}-Boites-${boxsize}-${price}`}><span>+</span></button>
