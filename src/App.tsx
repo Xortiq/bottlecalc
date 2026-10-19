@@ -277,50 +277,63 @@ function App() {
     }
   }
   
+  const sumPrecise = (values: any): number => {
+    if (values === undefined || values === null) return 0;
+    if (typeof values === 'number') return values;
+    if (typeof values === 'string') return Number(values) || 0;
+    if (Array.isArray(values)) {
+      return values.reduce((s: number, v: any) => s + (Number(v) || 0), 0);
+    }
+    if (typeof values === 'object') {
+      return Object.values(values).reduce((s: number, v: any) => s + sumPrecise(v), 0);
+    }
+    return 0;
+  };
+
   const storageVal = {
-    verifyData: (size, type) => {
-      if (size !== 10 && size !== 25) return null;
-      if (type !== 'sansAlcool' && type !== 'avecAlcool') return null;
+    verifyData: (size: any, type: any) => {
+      // if (size !== 10 && size !== 25) return null;
+      // if (type !== 'sansAlcool' && type !== 'avecAlcool') return null;
       return {
         bouteilleType: type,
         price: size,
       };
     },
-    getAmount: (size, type) => {
+    getAmount: (size: any, type: any) => {
       const data = storageVal.verifyData(size, type);
-      if (!data) return null;
+      // if (!data) return null;
 
       const liste = [];
       Object.entries(storage[data.bouteilleType][data.price].boites || {}).forEach(([boxsize, count]) => {
         if (data.bouteilleType == 'avecAlcool'&& size == 10 && boxsize == "24") return;
-        const total = boxsize * Math.sumPrecise(count)
+        const total = Number(boxsize) * sumPrecise(count)
         liste.push(total);
       });
-      liste.push(Math.sumPrecise(storage[data.bouteilleType][data.price].quantite));
+      liste.push(sumPrecise(storage[data.bouteilleType][data.price].quantite));
 
-      return Math.sumPrecise(liste);
+      return sumPrecise(liste);
     },
-    getPrice: (size, type) => {
+    getPrice: (size: any, type: any) => {
       return storageVal.getAmount(size, type) * (size === 10 ? 0.10 : 0.25);
     },
 
-    sansAlcool: (size) => {
+    sansAlcool: (size: any) => {
       return storageVal.getAmount(size, 'sansAlcool');
     },
-    prixSansAlcool: (size) => {
+    prixSansAlcool: (size: any) => {
       return storageVal.getPrice(size, 'sansAlcool');
     },
-    avecAlcool: (size) => {
+    avecAlcool: (size: any) => {
       return storageVal.getAmount(size, 'avecAlcool');
     },
-    prixAvecAlcool: (size) => {
+    prixAvecAlcool: (size: any) => {
       return storageVal.getPrice(size, 'avecAlcool');
     },
 
     caisse24: () => {
       const caisse = storage['avecAlcool']['10'].boites[24] || {};
       const etage = storage['autres']['etage'] || {};
-      return Math.sumPrecise(caisse) + Math.sumPrecise(etage) * 12;
+      return sumPrecise(caisse) + sumPrecise(etage) * 12;
     },
     prixCaisse24: () => {
       return storageVal.caisse24() * 2.40;
@@ -328,7 +341,7 @@ function App() {
 
     bouteilles18L: () => {
       const bouteilles18L = storage['autres']['bouteilles18L'] || {};
-      return Math.sumPrecise(bouteilles18L)
+      return sumPrecise(bouteilles18L)
     },
     prixBouteilles18L: () => {
       return storageVal.bouteilles18L() * 10;
@@ -336,30 +349,32 @@ function App() {
 
     palette: () => {
       const palette = storage['autres']['palette'] || {};
-      return Math.sumPrecise(palette)
+      return sumPrecise(palette)
     },
     prixPalette: () => {
       return storageVal.palette() * 201.60;
     },
 
-    gobbeuse: (type) => {
-      if (type !== 'ecraser' && type !== 'canettes' && type !== 'bouteilles') return null;
-      const gobbeuse = storage['autres']['gobbeuse'][type] || {};
-      return Math.sumPrecise(gobbeuse)
+    gobbeuse: (type: any) => {
+      // accept string keys but guard and use any cast to avoid TS index errors
+      const gb = storage['autres'] && storage['autres']['gobbeuse'] ? storage['autres']['gobbeuse'] as any : {};
+      const gobbeuse = gb[type] || {};
+      return sumPrecise(gobbeuse);
     },
-    prixGobbeuse: (type) => {
-      if (type !== 'ecraser' && type !== 'canettes' && type !== 'bouteilles') return null;
-      const priceListe = {
+    prixGobbeuse: (type: string) => {
+      const priceListe: Record<string, number> = {
         ecraser: 60,
         canettes: 24,
         bouteilles: 6,
-      }
-      return storageVal.gobbeuse(type) * priceListe[type];
+      };
+      const qty = storageVal.gobbeuse(type) || 0;
+      const price = priceListe[type] ?? 0;
+      return qty * price;
     },
 
-    prixMontant:(name, type)=>{
-      if (name !== 'ouverture' && name !== 'caisses' && name !== 'reception' && name !== 'fermeture') return null;
-      if (type !== 'sansAlcool' && type !== 'avecAlcool') return null;
+    prixMontant:(name: any, type: any)=>{
+      // if (name !== 'ouverture' && name !== 'caisses' && name !== 'reception' && name !== 'fermeture') return null;
+      // if (type !== 'sansAlcool' && type !== 'avecAlcool') return null;
       return storage.montant[name].quantite[type]
     }
   };
