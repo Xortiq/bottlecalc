@@ -452,7 +452,7 @@ function App() {
           Toggle Dark Mode
         </button>
       </div>
-      <button className="btn" onClick={() => session.clear()}>Reset</button>
+      {/* <button className="btn" onClick={() => session.clear()}>Reset</button> */}
     </>
   )
 }
